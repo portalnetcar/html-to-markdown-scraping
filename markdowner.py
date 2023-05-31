@@ -1,42 +1,51 @@
 import requests
 from bs4 import BeautifulSoup
-import mistune
-from urllib3.exceptions import InsecureRequestWarning
+import ssl
+import os
+import urllib.request
+import urllib3
 
-# Suppress only the single warning from urllib3 needed.
-requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+# Disable SSL warnings for urllib3, which is used by requests
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Set `verify=False` on `requests.post`.
-#requests.post(url='https://example.com', data={'bar':'baz'}, verify=False)
+# To ignore SSL certificate errors
+ssl._create_default_https_context = ssl._create_unverified_context
 
-# Step 1: Extract content from the target website
-url = 'https://...'
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.3"
-}
-response = requests.get(url, headers=headers, verify=False)
+url = 'https://cloudofthings.net/lab-10/'
+
+# Fetch the content from url, ignoring check of SSL certificate
+response = requests.get(url, verify=False)
 soup = BeautifulSoup(response.text, 'html.parser')
 
-article = soup.find('div')
-title = article.find('header').text
-content_parts = []
+# Find the article section by css selector
+article = soup.select('article')
 
-articles = article.find('article').text
-for article in articles:
-    cont_ul = article
-    content_parts.append(cont_ul)
-    print(cont_ul)
+# Create a directory for images
+if not os.path.exists('images'):
+    os.makedirs('images')
 
-content = ''.join(content_parts)
+md_content = ''
+for section in article:
+    # Append text content to markdown
+    md_content += section.get_text() + '\n\n'
+    
+    # Find all image tags
+    images = section.find_all('img')
 
-# Step 2: Convert the content into a Markdown file
-markdown_title = f"# {title}\n\n"
-markdown_content = mistune.markdown(content)
-markdown_end_link = f"\n\n# Link: {url}\n\n"
+    # Create an unverified SSL context for image downloading
+    ssl_context = ssl._create_unverified_context()
 
-with open('article.md', 'w') as file:
-    file.write(markdown_title)
-    file.write(markdown_content)
-    file.write(markdown_end_link)
+    for i, img in enumerate(images):
+        img_url = img['src']
+        
+        # Download image, ignoring SSL certificate validation
+        with urllib.request.urlopen(img_url, context=ssl_context) as response, open(f'images/image_{i}.jpg', 'wb') as out_file:
+            data = response.read()  # a `bytes` object
+            out_file.write(data)
+        
+        # Append image to markdown
+        md_content += f'![Image {i}](images/image_{i}.jpg)\n\n'
 
-print("Article saved as article.md")
+# Write to markdown file
+with open('article.md', 'w') as f:
+    f.write(md_content)
