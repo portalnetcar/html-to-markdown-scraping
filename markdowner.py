@@ -36,10 +36,14 @@ class MarkdownGenerator:
         elif node.name == 'code':
             # Handle code block
             self.md_content += '```\n' + node.get_text() + '\n```\n\n'
+        elif node.name == 'a':
+            # Handle link
+            self.md_content += f'[{node.get_text()}]({node["href"]})\n\n'
         else:
             # Recursively handle children of other nodes
             for child in node.children:
                 self.handle_node(child)
+
 
 
     def generate_markdown(self, url, css_selector):
