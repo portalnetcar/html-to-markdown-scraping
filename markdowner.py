@@ -33,10 +33,14 @@ class MarkdownGenerator:
         elif node.name is None:
             # Append text node to markdown
             self.md_content += node + '\n\n'
+        elif node.name == 'code':
+            # Handle code block
+            self.md_content += '```\n' + node.get_text() + '\n```\n\n'
         else:
             # Recursively handle children of other nodes
             for child in node.children:
                 self.handle_node(child)
+
 
     def generate_markdown(self, url, css_selector):
         # Fetch the content from url, ignoring check of SSL certificate
