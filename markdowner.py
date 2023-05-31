@@ -4,6 +4,7 @@ import ssl
 import os
 import urllib.request
 import urllib3
+import sys
 
 # Disable SSL warnings for urllib3, which is used by requests
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -65,7 +66,12 @@ class MarkdownGenerator:
         with open('article.md', 'w') as f:
             f.write(self.md_content)
 
-url = 'https://...'
-css_selector = 'article'  # replace this with your actual CSS selector
-generator = MarkdownGenerator()
-generator.generate_markdown(url, css_selector)
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python3 your_script.py URL CSS_SELECTOR")
+        sys.exit(1)
+
+    url = sys.argv[1]  # first command-line argument
+    css_selector = sys.argv[2]  # second command-line argument
+    generator = MarkdownGenerator()
+    generator.generate_markdown(url, css_selector)
