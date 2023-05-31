@@ -26,7 +26,7 @@ or to run without download:
 #!/bin/bash
 
 # Fetch and run the Python script
-curl -sSL https://raw.githubusercontent.com/username/repository/branch/script.py | python3 - "https://pageurl" "section"
+curl -sSL https://raw.githubusercontent.com/portalnetcar/html-to-markdown-scraping/main/markdowner.py | python3 - "https://pageurl" "section"
 
 ```
 Enjoy 
