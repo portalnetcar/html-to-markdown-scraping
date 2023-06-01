@@ -40,3 +40,4 @@ Please note that web scraping should be done responsibly and ethically. It's cru
 ## Links
 
 - https://www.baeldung.com/cs/web-crawling-vs-web-scraping
+- https://stackoverflow.com/questions/15445981/how-do-i-disable-the-security-certificate-check-in-python-requests
